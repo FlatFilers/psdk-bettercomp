@@ -223,6 +223,62 @@ const Jobs = new Sheet('Jobs', {
     }
 )
 
+const Employees = new Sheet('Employees', {
+  employeeID: TextField({
+    label: 'Employee ID',
+    required: true,
+    primary: true,
+    unique: true,
+    description: 'Unique code for employee. This is a Key Field'
+  }),
+  firstName: TextField({
+    label: 'First',
+    description: "Employee's first name"
+  }),
+  lastName: TextField({
+    label: 'Last Name',
+    description: "Employee's last name"
+  }),
+  employeeName: TextField({
+    label: 'Employee Name',
+    description: "Employee's full name"
+  }),
+  jobCode: LinkedField({
+    label: 'Job Code',
+    description: "Employee's job code. This is the Key Field linking to the Job table",
+    sheet: Jobs,
+    upsert: false,
+    stageVisibility: {
+      mapping: false,
+      review: true, 
+      export: false
+    }
+  }),
+  // This field should get populated based on a lookup from the Jobs table
+  // jobTitle: TextField({
+  //   label: 'Job Title',
+  //   description: 'Job title based on job code'
+  // }),
+  baseSalary: NumberField({
+    label: 'Base Salary',
+    description: "Employee's annualized base salary. Must be annualized based on 1 FTE"
+  })
+},
+{
+  previewFieldKey: "employeeID",
+  // Record Hooks to add:
+  // Trim all values
+  // TBD:
+  // Remove all zeroes - when would this be necessary?
+  recordCompute: (record: any) => {
+
+    return record
+    }
+
+  },
+
+) 
+
 const sheets = {
     Jobs,
     SalaryRange,
