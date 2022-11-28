@@ -26,24 +26,24 @@ import {
 
 const SalaryRange = new Sheet('SalaryRange', {
   salaryGroup: TextField({
-    display: 'Salary Group',
+    label: 'Salary Group',
     required: true,
     description: 'Salary range group. Used when there are multiple min-mid-max values or currencies associated with a single structure + grade combination. Commonly seen for premium or discounted range variations as well as location differentiators for geographically disparate ranges, including global versioning.'
   }),
 // Quick note on these two. I'm not sure if they're independently unique, or the combination of the two is unique? If so, I might create a composite field
 // in this dataset for the uniqueness check, as well as a composite field in the Jobs dataset to create a link
   structure: TextField({
-    display: 'Structure',
+    label: 'Structure',
     description: 'Salary structure. Utilized where multiple structure are present (ex: Executive, Exempt, Non-Exempt, Technical, Nursing, etc.) If organization does not have multiple structures this field may be equal to organization name or code. This is a Key Field linking to the Job table',
     required: true
   }),
   grade: TextField({
-    display: 'Grade',
+    label: 'Grade',
     description: 'Salary range grade. This is a Key Field linking to the Job table',
     required: true
   }),
   structureGrade: TextField({
-    display: 'Structure + Grade',
+    label: 'Structure + Grade',
     description: 'Composite field to uniquely validate the combination of Structure and Grade',
     unique: true,
       stageVisibility: {
@@ -53,23 +53,24 @@ const SalaryRange = new Sheet('SalaryRange', {
       }
   }),
   min: NumberField({
-    display: 'Min',
+    label: 'Min',
     description: 'Salary range minimum. Must be annualized value'
   }),
   mid: NumberField({
-    display: 'Min',
+    label: 'Min',
     description: 'Salary range minimum. Must be annualized value',
     required: true
   }),
   max: NumberField({
-    display: 'Max',
+    label: 'Max',
     description: 'Salary range minimum. Must be annualized value'
   }),
   currency: OptionField({
-    display: 'Currency',
+    label: 'Currency',
     required: true,
     description: 'Currency for salary range.',
-    default: 'USD',
+// Bug with default in OptionField, will comment out for now
+    // default: "USD",
 // Don't have to hardcode this whole list, can reference a table or API
     options: {
       USD: 'USD',
@@ -78,7 +79,7 @@ const SalaryRange = new Sheet('SalaryRange', {
     }
   }),
   effectiveDate: DateField({
-    display: 'Effective Date',
+    label: 'Effective Date',
     description: 'Effective date of salary range'
   })
 },
@@ -106,59 +107,59 @@ const SalaryRange = new Sheet('SalaryRange', {
 
 const Jobs = new Sheet('Jobs', {
   jobCode: TextField({
-    display: 'Job Code',
+    label: 'Job Code',
     required: true,
     primary: true,
     unique: true,
     description: 'Unique code for job. This is a Key Field'
   }),
   jobTitle: TextField({
-    display: 'Job Title',
+    label: 'Job Title',
     required: true,
     description: 'Title for job'
   }),
   jobFamilyCode: TextField({
-    display: 'Job Family Code',
+    label: 'Job Family Code',
     description: 'Job family code for job. Parent to Job Subfamily Code. Must be unique. Alternatively Job Function Code',
     default: 'JF ND'
   }),
   jobFamilyTitle: TextField({
-    display: 'Job Family Title',
+    label: 'Job Family Title',
     description: 'Job family title for job. Alternatively Job Function Title',
     default: 'Not Defined'
   }),
   jobSubfamilyCode: TextField({
-    display: 'Job Subfamily Code',
+    label: 'Job Subfamily Code',
     description: 'Job subfamily code for job. Child to Job Family Code. Must be unique',
     default: 'SF ND'
   }),
   jobSubfamilyTitle: TextField({
-    display: 'Job Subfamily Title',
+    label: 'Job Subfamily Title',
     description: 'Job subfamily title for job',
     default: 'Not Defined'
   }),
   jobCategoryCode: TextField({
-    display: 'Job Category Code',
+    label: 'Job Category Code',
     description: 'Career path/track code for job, grouping of levels. Parent to Job Level Code. Must be unique',
     default: 'All'
   }),
   jobCategoryTitle: TextField({
-    display: 'Job Category Title',
+    label: 'Job Category Title',
     description: 'Career path/track title for job, grouping of levels. (ex: Executive, Professional, IC, Support, etc.)',
     default: 'All'
   }),
   jobLevelCode: TextField({
-    display: 'Job Level Code',
+    label: 'Job Level Code',
     description: 'Job level code for job. Child to Job Category Code. Must be unique',
     default: 'L ND'
   }),
   jobLevelTitle: TextField({
-    display: 'Job Level Title',
+    label: 'Job Level Title',
     description: 'Job level title for job',
     default: 'Not Defined'
   }),
   jobLevelSortOrder: NumberField({
-    display: 'Job Level Sort Order',
+    label: 'Job Level Sort Order',
     description: 'Used to sort job levels based on hierarchy'
   }),
   salaryStructure: TextField({
@@ -195,7 +196,8 @@ const Jobs = new Sheet('Jobs', {
   status: OptionField({
     label: 'Status',
     description: 'Please enter either "Active" or "Inactive." If left blank, the status will default to Active.',
-    default: 'Active',
+// Bug with default in OptionField, will comment out for now
+    // default: 'Active',
     options: {
       active: 'Active',
       inactive: 'Inactive'
