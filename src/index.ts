@@ -16,6 +16,7 @@ import {
   DateField,
   OptionField
 } from '@flatfile/configure'
+import { isNull, trim } from 'lodash'
 
 /**
  * Sheets
@@ -28,6 +29,7 @@ const SalaryRange = new Sheet('SalaryRange', {
   salaryGroup: TextField({
     label: 'Salary Group',
     required: true,
+    compute: (value) => value.trim(),
     description: 'Salary range group. Used when there are multiple min-mid-max values or currencies associated with a single structure + grade combination. Commonly seen for premium or discounted range variations as well as location differentiators for geographically disparate ranges, including global versioning.'
   }),
 // Quick note on these two. I'm not sure if they're independently unique, or the combination of the two is unique? If so, I might create a composite field
@@ -40,12 +42,14 @@ const SalaryRange = new Sheet('SalaryRange', {
   grade: TextField({
     label: 'Grade',
     description: 'Salary range grade. This is a Key Field linking to the Job table',
-    required: true
+    required: true,
+    compute: (value) => value.trim()
   }),
   structureGrade: TextField({
     label: 'Structure + Grade',
     description: 'Composite field to uniquely validate the combination of Structure and Grade',
     unique: true,
+    compute: (value) => value.trim(),
       stageVisibility: {
         mapping: false,
         review: true, 
@@ -57,8 +61,8 @@ const SalaryRange = new Sheet('SalaryRange', {
     description: 'Salary range minimum. Must be annualized value'
   }),
   mid: NumberField({
-    label: 'Min',
-    description: 'Salary range minimum. Must be annualized value',
+    label: 'Mid',
+    description: 'Salary range median. Must be annualized value',
     required: true
   }),
   max: NumberField({
@@ -68,6 +72,7 @@ const SalaryRange = new Sheet('SalaryRange', {
   currency: OptionField({
     label: 'Currency',
     required: true,
+    compute: (value) => value.trim(),
     description: 'Currency for salary range.',
 // Bug with default in OptionField, will comment out for now
     // default: "USD",
@@ -86,23 +91,24 @@ const SalaryRange = new Sheet('SalaryRange', {
   {
   previewFieldKey: "structureGrade",
   // Record Hooks to add:
-  // Trim all values
-  // TBD:
   // Remove all zeroes - when would this be necessary?
   recordCompute: (record: any) => {
+    
   // Create composide Structure + Grade field for linking
     const compositeKey = `${record.get('structure')} ${record.get('grade')}`
     record.set('structureGrade', compositeKey)
-  // Calculate mid if not present
-    // if (isNull(record.get('mid')) && record.get('min') && record.get('max')) {
-    //   record.set('mid',(record.get('max') + record.get('min')) / 2)
-    // }
 
+  // Calculate mid if not present 
+    const min = record.get('min')
+    const max = record.get('max')
+    const mid = record.get('mid')
+    if (min.isNull() && max && mid) {
+      const calculatedMid = (min + max) / 2
+      record.set('mid',calculatedMid)
+    }
     return record
     }
-
   },
-
 )
 
 const Jobs = new Sheet('Jobs', {
@@ -111,50 +117,60 @@ const Jobs = new Sheet('Jobs', {
     required: true,
     primary: true,
     unique: true,
+    compute: (value) => value.trim(),
     description: 'Unique code for job. This is a Key Field'
   }),
   jobTitle: TextField({
     label: 'Job Title',
     required: true,
+    compute: (value) => value.trim(),
     description: 'Title for job'
   }),
   jobFamilyCode: TextField({
     label: 'Job Family Code',
+    compute: (value) => value.trim(),
     description: 'Job family code for job. Parent to Job Subfamily Code. Must be unique. Alternatively Job Function Code',
     default: 'JF ND'
   }),
   jobFamilyTitle: TextField({
     label: 'Job Family Title',
+    compute: (value) => value.trim(),
     description: 'Job family title for job. Alternatively Job Function Title',
     default: 'Not Defined'
   }),
   jobSubfamilyCode: TextField({
     label: 'Job Subfamily Code',
+    compute: (value) => value.trim(),
     description: 'Job subfamily code for job. Child to Job Family Code. Must be unique',
     default: 'SF ND'
   }),
   jobSubfamilyTitle: TextField({
     label: 'Job Subfamily Title',
+    compute: (value) => value.trim(),
     description: 'Job subfamily title for job',
     default: 'Not Defined'
   }),
   jobCategoryCode: TextField({
     label: 'Job Category Code',
+    compute: (value) => value.trim(),
     description: 'Career path/track code for job, grouping of levels. Parent to Job Level Code. Must be unique',
     default: 'All'
   }),
   jobCategoryTitle: TextField({
     label: 'Job Category Title',
+    compute: (value) => value.trim(),
     description: 'Career path/track title for job, grouping of levels. (ex: Executive, Professional, IC, Support, etc.)',
     default: 'All'
   }),
   jobLevelCode: TextField({
     label: 'Job Level Code',
+    compute: (value) => value.trim(),
     description: 'Job level code for job. Child to Job Category Code. Must be unique',
     default: 'L ND'
   }),
   jobLevelTitle: TextField({
     label: 'Job Level Title',
+    compute: (value) => value.trim(),
     description: 'Job level title for job',
     default: 'Not Defined'
   }),
@@ -164,14 +180,17 @@ const Jobs = new Sheet('Jobs', {
   }),
   salaryStructure: TextField({
     label: 'Salary Structure',
+    compute: (value) => value.trim(),
     description: 'Salary structure job is assigned to. Distinct from Salary Group. REQUIRED if Salary Range file loading is desired'
   }),
   grade: TextField({
     label: 'Grade',
+    compute: (value) => value.trim(),
     description: 'Grade job is assigned to. REQUIRED if Salary Range file loading is desired'
   }),
   structureGrade: LinkedField({
     label: 'Structure + Grade',
+    compute: (value) => value.trim(),
     description: 'Composite field to link a combination of structure + grade to a Salary Range',
     sheet: SalaryRange,
     upsert: false,
@@ -183,6 +202,7 @@ const Jobs = new Sheet('Jobs', {
   }),
   flsaStatus: TextField({
     label: 'FLSA status',
+    compute: (value) => value.trim(),
     description: 'FLSA status for job'
   }),
   stiTarget: NumberField({
@@ -195,6 +215,7 @@ const Jobs = new Sheet('Jobs', {
   }),
   status: OptionField({
     label: 'Status',
+    compute: (value) => value.trim(),
     description: 'Please enter either "Active" or "Inactive." If left blank, the status will default to Active.',
 // Bug with default in OptionField, will comment out for now
     // default: 'Active',
@@ -207,8 +228,6 @@ const Jobs = new Sheet('Jobs', {
   {
     previewFieldKey: "jobCode",
     // Record Hooks to add:
-    // Trim all values
-    // TBD:
     // Remove all zeroes - when would this be necessary?
     recordCompute: (record: any) => {
       const compositeKey = `${record.get('salaryStructure')} ${record.get('grade')}`
@@ -229,22 +248,27 @@ const Employees = new Sheet('Employees', {
     required: true,
     primary: true,
     unique: true,
+    compute: (value) => value.trim(),
     description: 'Unique code for employee. This is a Key Field'
   }),
   firstName: TextField({
     label: 'First',
+    compute: (value) => value.trim(),
     description: "Employee's first name"
   }),
   lastName: TextField({
     label: 'Last Name',
+    compute: (value) => value.trim(),
     description: "Employee's last name"
   }),
   employeeName: TextField({
     label: 'Employee Name',
+    compute: (value) => value.trim(),
     description: "Employee's full name"
   }),
   jobCode: LinkedField({
     label: 'Job Code',
+    compute: (value) => value.trim(),
     description: "Employee's job code. This is the Key Field linking to the Job table",
     sheet: Jobs,
     upsert: false,
