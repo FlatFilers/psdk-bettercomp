@@ -37,7 +37,8 @@ const SalaryRange = new Sheet('SalaryRange', {
   structure: TextField({
     label: 'Structure',
     description: 'Salary structure. Utilized where multiple structure are present (ex: Executive, Exempt, Non-Exempt, Technical, Nursing, etc.) If organization does not have multiple structures this field may be equal to organization name or code. This is a Key Field linking to the Job table',
-    required: true
+    required: true,
+    compute: (value) => value.trim()
   }),
   grade: TextField({
     label: 'Grade',
@@ -93,7 +94,7 @@ const SalaryRange = new Sheet('SalaryRange', {
   // Record Hooks to add:
   // Remove all zeroes - when would this be necessary?
   recordCompute: (record: any) => {
-    
+
   // Create composide Structure + Grade field for linking
     const compositeKey = `${record.get('structure')} ${record.get('grade')}`
     record.set('structureGrade', compositeKey)
@@ -291,9 +292,7 @@ const Employees = new Sheet('Employees', {
 {
   previewFieldKey: "employeeID",
   // Record Hooks to add:
-  // Trim all values
-  // TBD:
-  // Remove all zeroes - when would this be necessary?
+  // 
   recordCompute: (record: any) => {
 
     return record
@@ -306,7 +305,7 @@ const Employees = new Sheet('Employees', {
 const sheets = {
     Jobs,
     SalaryRange,
-    // Employees
+    Employees
   }
 
 // Workbook  - Update to reference your Workbook with Sheet(s) and Portal(s)
