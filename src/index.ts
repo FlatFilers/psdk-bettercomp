@@ -89,6 +89,10 @@ const SalaryRange = new Sheet('SalaryRange', {
     description: 'Effective date of salary range'
   })
 },
+GradeSortOrder: NumberField({
+  label: 'Grade Sort Order',
+  description: 'Used to sort Grades on heirachy. Based exclusively on Grade'
+}),
   {
   previewFieldKey: "structureGrade",
   // Record Hooks to add:
