@@ -81,18 +81,19 @@ const SalaryRange = new Sheet('SalaryRange', {
     options: {
       USD: 'USD',
       GBP: 'GBP',
-      EUR: 'EUR'
+      EUR: 'EUR',
+      CAD: 'CAD'
     }
   }),
   effectiveDate: DateField({
     label: 'Effective Date',
     description: 'Effective date of salary range'
+  }),
+  gradeSortOrder: NumberField({
+    label: 'Grade Sort Order',
+    description: 'Used to sort Grades on heirachy. Based exclusively on Grade'
   })
 },
-GradeSortOrder: NumberField({
-  label: 'Grade Sort Order',
-  description: 'Used to sort Grades on heirachy. Based exclusively on Grade'
-}),
   {
   previewFieldKey: "structureGrade",
   // Record Hooks to add:
