@@ -46,9 +46,9 @@ const SalaryRange = new Sheet('SalaryRange', {
     required: true,
     compute: (value) => value.trim()
   }),
-  structureGrade: TextField({
-    label: 'Structure + Grade',
-    description: 'Composite field to uniquely validate the combination of Structure and Grade',
+  structureGradeSort: TextField({
+    label: 'Structure + Grade + Sort Order',
+    description: 'Composite field to uniquely validate the combination of Structure, Grade, and Sort Order. Used to Link to Jobs.',
     unique: true,
     compute: (value) => value.trim(),
       stageVisibility: {
@@ -95,14 +95,14 @@ const SalaryRange = new Sheet('SalaryRange', {
   })
 },
   {
-  previewFieldKey: "structureGrade",
+  previewFieldKey: "structureGradeSort",
   // Record Hooks to add:
   // Remove all zeroes - when would this be necessary?
   recordCompute: (record: any) => {
 
   // Create composide Structure + Grade field for linking
-    const compositeKey = `${record.get('structure')} ${record.get('grade')}`
-    record.set('structureGrade', compositeKey)
+    const compositeKey = `${record.get('structure')} ${record.get('grade')} ${record.get('gradeSortOrder')}`
+    record.set('structureGradeSort', compositeKey)
 
   // Calculate mid if not present 
     const min = record.get('min')
@@ -194,10 +194,9 @@ const Jobs = new Sheet('Jobs', {
     compute: (value) => value.trim(),
     description: 'Grade job is assigned to. REQUIRED if Salary Range file loading is desired'
   }),
-  structureGrade: LinkedField({
-    label: 'Structure + Grade',
-    compute: (value) => value.trim(),
-    description: 'Composite field to link a combination of structure + grade to a Salary Range',
+  structureGradeSort: LinkedField({
+    label: 'Structure + Grade + Sort',
+    description: 'Composite field to link a combination of structure, grade, and sort order to a Salary Range',
     sheet: SalaryRange,
     upsert: false,
     stageVisibility: {
@@ -236,8 +235,9 @@ const Jobs = new Sheet('Jobs', {
     // Record Hooks to add:
     // Remove all zeroes - when would this be necessary?
     recordCompute: (record: any) => {
-      const compositeKey = `${record.get('salaryStructure')} ${record.get('grade')}`
-      record.set('structureGrade', compositeKey)
+      const compositeKey = `${record.get('salaryStructure')} ${record.get('grade')} ${record.get('jobLevelSortOrder')}`
+      // record.set('structureGradeSort', compositeKey)
+      record.set('structureGradeSort::structureGradeSort',compositeKey)
       return record
       }
     // Batch Record Hooks (or Sheet/Field Hooks) to add:
@@ -279,7 +279,7 @@ const Employees = new Sheet('Employees', {
     sheet: Jobs,
     upsert: false,
     stageVisibility: {
-      mapping: false,
+      mapping: true,
       review: true, 
       export: false
     }
