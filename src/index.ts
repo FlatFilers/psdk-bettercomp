@@ -16,7 +16,6 @@ import {
   DateField,
   OptionField
 } from '@flatfile/configure'
-import { isNull, trim } from 'lodash'
 
 /**
  * Sheets
@@ -25,7 +24,7 @@ import { isNull, trim } from 'lodash'
  */
 
 
-const SalaryRange = new Sheet('SalaryRange', {
+const SalaryRange = new Sheet('Salary Range - Eric', {
   salaryGroup: TextField({
     label: 'Salary Group',
     required: true,
@@ -75,8 +74,7 @@ const SalaryRange = new Sheet('SalaryRange', {
     required: true,
     compute: (value) => value.trim(),
     description: 'Currency for salary range.',
-// Bug with default in OptionField, will comment out for now
-    // default: "USD",
+    default: "USD",
 // Don't have to hardcode this whole list, can reference a table or API
     options: {
       USD: 'USD',
@@ -117,7 +115,7 @@ const SalaryRange = new Sheet('SalaryRange', {
   },
 )
 
-const Jobs = new Sheet('Jobs', {
+const Jobs = new Sheet('Jobs - Eric', {
   jobCode: TextField({
     label: 'Job Code',
     required: true,
@@ -236,8 +234,7 @@ const Jobs = new Sheet('Jobs', {
     // Remove all zeroes - when would this be necessary?
     recordCompute: (record: any) => {
       const compositeKey = `${record.get('salaryStructure')} ${record.get('grade')} ${record.get('jobLevelSortOrder')}`
-      // record.set('structureGradeSort', compositeKey)
-      record.set('structureGradeSort::structureGradeSort',compositeKey)
+      record.setLinkedValue('structureGradeSort','structureGradeSort',compositeKey)
       return record
       }
     // Batch Record Hooks (or Sheet/Field Hooks) to add:
@@ -248,7 +245,7 @@ const Jobs = new Sheet('Jobs', {
     }
 )
 
-const Employees = new Sheet('Employees', {
+const Employees = new Sheet('Employees - Eric', {
   employeeID: TextField({
     label: 'Employee ID',
     required: true,
@@ -281,7 +278,7 @@ const Employees = new Sheet('Employees', {
     stageVisibility: {
       mapping: true,
       review: true, 
-      export: false
+      export: true
     }
   }),
   // This field should get populated based on a lookup from the Jobs table
